@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCA FullStack Master Dashboard - Amit Sir</title>
+    <style>
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-header: #ffffff;
+            --bg-sidebar: #1e293b;
+            --text-main: #334155;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent: #e11d48;
+            --success: #10b981;
+            --danger: #ef4444;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
+
+        /* --- TOP HEADER --- */
+        .header { height: 70px; background: var(--bg-header); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 20; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent); }
+        
+        .unit-selector { display: flex; align-items: center; gap: 15px; }
+        .unit-selector label { font-weight: bold; font-size: 1.1rem; }
+        .unit-selector select { padding: 10px 20px; font-size: 1.1rem; border: 2px solid var(--primary); border-radius: 8px; outline: none; cursor: pointer; background: #eff6ff; color: var(--primary); font-weight: bold; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-layout { display: flex; height: calc(100vh - 70px); }
+
+        /* --- SIDEBAR MENU --- */
+        .sidebar { width: 320px; background: var(--bg-sidebar); color: #cbd5e1; display: flex; flex-direction: column; overflow-y: auto; padding-top: 20px; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 10; }
+        .menu-title { padding: 0 20px 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: bold; border-bottom: 1px solid #334155; margin-bottom: 10px; }
+        .topic-btn { background: none; border: none; color: #cbd5e1; padding: 15px 20px; text-align: left; font-size: 1.05rem; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; }
+        .topic-btn:hover { background: #334155; color: white; }
+        .topic-btn.active { background: #0f172a; color: white; border-left-color: var(--primary); font-weight: bold; }
+
+        /* --- CONTENT AREA --- */
+        .content-area { flex-grow: 1; padding: 30px 40px; overflow-y: auto; scroll-behavior: smooth; }
+        .topic-header { margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+        .topic-header h1 { color: #0f172a; font-size: 2.2rem; }
+
+        /* GRID SYSTEM FOR CARDS */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .full-width { grid-column: span 2; }
+
+        /* CARDS */
+        .card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid var(--border); }
+        .card h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 1.2rem; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .card p { font-size: 1.05rem; line-height: 1.6; }
+
+        .def-card { border-top: 4px solid var(--primary); }
+        .adv-card { border-top: 4px solid var(--success); }
+        .dis-card { border-top: 4px solid var(--danger); }
+        .use-card { border-top: 4px solid #8b5cf6; }
+
+        ul.feature-list { list-style: none; padding: 0; }
+        ul.feature-list li { margin-bottom: 8px; padding-left: 25px; position: relative; font-size: 1.05rem; }
+        ul.feature-list.adv li::before { content: '✅'; position: absolute; left: 0; }
+        ul.feature-list.dis li::before { content: '❌'; position: absolute; left: 0; }
+
+        /* CODE SECTION */
+        .code-container { display: flex; flex-direction: column; background: #1e1e1e; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        .code-header { background: #2d2d2d; padding: 10px 20px; color: #fff; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .run-btn { background: var(--success); color: white; border: none; padding: 6px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .run-btn:hover { background: #059669; }
+        .code-block { padding: 20px; color: #e5e5e5; font-family: Consolas, monospace; font-size: 1.05rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.5; }
+        .token-keyword { color: #569cd6; } .token-string { color: #ce9178; } .token-tag { color: #569cd6; } .token-attr { color: #9cdcfe; }
+
+        /* OUTPUT SIMULATOR */
+        .output-card { border: 2px solid var(--success); background: #f0fdf4; }
+        .output-card h3 { color: var(--success); border-bottom-color: #bbf7d0; }
+        .sim-box { padding: 15px; background: white; border: 1px dashed #cbd5e1; border-radius: 8px; min-height: 80px; font-size: 1.1rem; color: #0f172a; }
+
+        /* Animation */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">👨‍🏫 Amit Sir's <span>FullStack</span> Dashboard</div>
+        <div class="unit-selector">
+            <label for="unitSelect">Select Syllabus Unit:</label>
+            <select id="unitSelect" onchange="loadUnit(this.value)">
+                <option value="1">Unit 1: Angular, TS, Bindings & Forms</option>
+                <option value="2">Unit 2: Pipes, SPA, Routing & Deploy</option>
+                <option value="3">Unit 3: AngularJS & MVC Arch.</option>
+                <option value="4">Unit 4: Filters, Validations & DOM</option>
+                <option value="5">Unit 5: Node.js & MEAN Hosting</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="menu-title" id="sidebarTitle">Topics (Unit 1)</div>
+            <div id="topicList">
+                </div>
+        </aside>
+
+        <main class="content-area" id="contentArea">
+            </main>
+
+    </div>
+
+    <script>
+        // MASSIVE DATABASE COVERING EVERY SINGLE SYLLABUS TOPIC
+        const syllabusData = {
+            "1": [
+                {
+                    id: "u1_1", title: "Intro to Angular, Typescript & ES6",
+                    def: "<b>Angular:</b> A platform and framework for building single-page client applications using HTML and TypeScript.<br><b>TypeScript:</b> A syntactic superset of JavaScript which adds static typing.<br><b>ES6:</b> ECMAScript 2015, brought modern features like let/const, classes, and arrow functions to JS.",
+                    adv: ["Provides strict typing (TS) catching errors early.", "Modular architecture.", "Powerful CLI for quick setup."],
+                    dis: ["Steep learning curve for beginners.", "Verbose syntax compared to React.", "Heavy initial load size."],
+                    use: "Enterprise-level web applications, complex Single Page Applications (SPAs) like Gmail.",
+                    code: `<span class="token-keyword">import</span> { Component } <span class="token-keyword">from</span> <span class="token-string">'@angular/core'</span>;\n\n<span class="token-keyword">const</span> welcomeMsg = <span class="token-string">"Hello ES6 & TS!"</span>; // ES6 syntax`,
+                    runOutput: "Angular Application Initialized successfully. TypeScript compiled to ES6."
+                },
+                {
+                    id: "u1_2", title: "Components in Angular Module 2",
+                    def: "Components are the main building block for Angular applications. Each component consists of an HTML template, a CSS stylesheet, and a TypeScript class that controls the view.",
+                    adv: ["Reusability of UI code.", "Separation of concerns.", "Easy to test isolated components."],
+                    dis: ["Over-componentization can lead to complex file structures.", "Requires managing data passing (@Input/@Output) between them."],
+                    use: "Creating reusable UI elements like Navbars, Data Tables, and User Profile cards.",
+                    code: `@Component({\n  selector: <span class="token-string">'app-header'</span>,\n  template: <span class="token-string">'&lt;h1&gt;Header Component&lt;/h1&gt;'</span>\n})\n<span class="token-keyword">export class</span> HeaderComponent { }`,
+                    runOutput: "<h2>Header Component</h2> (Rendered successfully on screen)"
+                },
+                {
+                    id: "u1_3", title: "Data and Event Binding",
+                    def: "<b>Data Binding</b> defines how data flows between the Component class and the HTML template.<br>• Interpolation <code>{{ }}</code><br>• Property Binding <code>[ ]</code><br>• Event Binding <code>( )</code><br>• Two-Way Binding <code>[( )]</code>",
+                    adv: ["Automatic synchronization of data and UI.", "Reduces boilerplate DOM manipulation code."],
+                    dis: ["Two-way binding can cause performance issues if overused in large lists (digest cycle overhead)."],
+                    use: "Displaying dynamic user data, handling button clicks, reading input field values in real-time.",
+                    code: `<span class="token-tag">&lt;input</span> <span class="token-attr">[(ngModel)]</span>=<span class="token-string">"userName"</span><span class="token-tag">&gt;</span>\n<span class="token-tag">&lt;button</span> <span class="token-attr">(click)</span>=<span class="token-string">"save()"</span><span class="token-tag">&gt;</span>Save<span class="token-tag">&lt;/button&gt;</span>\n<span class="token-tag">&lt;p&gt;</span>Hello {{ userName }}<span class="token-tag">&lt;/p&gt;</span>`,
+                    runOutput: "<div style='display:flex;gap:10px;'><input type='text' value='Amit Sir' disabled><button disabled>Save</button></div><p style='margin-top:10px;color:blue;'>Hello Amit Sir</p>"
+                },
+                {
+                    id: "u1_4", title: "Structural Directives",
+                    def: "Structural directives are responsible for HTML layout. They shape or reshape the DOM's structure, typically by adding, removing, or manipulating elements. E.g., <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code>.",
+                    adv: ["Easily manipulate DOM structure without raw JavaScript.", "Clean and readable HTML logic."],
+                    dis: ["Complex nested directives can be hard to read.", "Improper use of *ngFor without trackBy can cause rendering lags."],
+                    use: "Displaying lists of data (tables/grids) using *ngFor, or showing/hiding login buttons using *ngIf.",
+                    code: `<span class="token-tag">&lt;div</span> <span class="token-attr">*ngIf</span>=<span class="token-string">"isLoggedIn"</span><span class="token-tag">&gt;</span>Welcome User!<span class="token-tag">&lt;/div&gt;</span>\n<span class="token-tag">&lt;li</span> <span class="token-attr">*ngFor</span>=<span class="token-string">"let item of items"</span><span class="token-tag">&gt;</span>{{ item }}<span class="token-tag">&lt;/li&gt;</span>`,
+                    runOutput: "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul> (Generated via *ngFor loop)"
+                },
+                {
+                    id: "u1_5", title: "Attribute Directives and Property Bindings",
+                    def: "<b>Attribute Directives:</b> Change the appearance or behavior of an element, component, or another directive (e.g., <code>ngClass</code>, <code>ngStyle</code>).<br><b>Property Binding:</b> Sets values for properties of HTML elements or directives.",
+                    adv: ["Dynamic styling based on state (e.g., red color if error).", "Highly reusable custom behaviors."],
+                    dis: ["Can clutter HTML if styling logic becomes too complex inside the template."],
+                    use: "Highlighting a table row when selected, disabling a button when a form is invalid.",
+                    code: `<span class="token-tag">&lt;p</span> <span class="token-attr">[ngStyle]</span>=<span class="token-string">"{'color': isError ? 'red' : 'green'}"</span><span class="token-tag">&gt;</span>Status<span class="token-tag">&lt;/p&gt;</span>\n<span class="token-tag">&lt;img</span> <span class="token-attr">[src]</span>=<span class="token-string">"imgUrl"</span><span class="token-tag">&gt;</span>`,
+                    runOutput: "<p style='color: green; font-weight: bold;'>Status Message (Green dynamically applied via ngStyle)</p>"
+                },
+                {
+                    id: "u1_6", title: "Template / Model Driven Forms",
+                    def: "<b>Template-driven forms:</b> Heavy logic in HTML template using `ngModel`. Good for simple forms.<br><b>Model-driven (Reactive) forms:</b> Heavy logic in Component class using `FormGroup`/`FormControl`. Good for complex, scalable forms.",
+                    adv: ["Reactive forms provide better unit testing capabilities.", "Template forms are very quick to setup for simple tasks."],
+                    dis: ["Reactive forms require more TypeScript boilerplate code.", "Template forms lack easy dynamic field generation."],
+                    use: "User Registration, Multi-step checkout processes, Login screens.",
+                    code: `// Reactive Form Example\nthis.loginForm = new FormGroup({\n  email: new FormControl('', Validators.required)\n});`,
+                    runOutput: "Form State: INVALID (Email is required). Submit Button Disabled."
+                }
+            ],
+            "2": [
+                {
+                    id: "u2_1", title: "Pipes and Data Formatting",
+                    def: "Pipes are simple functions to use in template expressions to accept an input value and return a transformed value. Examples: `DatePipe`, `UpperCasePipe`, `CurrencyPipe`.",
+                    adv: ["Data transformation directly in HTML without altering component data.", "Can be chained together."],
+                    dis: ["Heavy custom pipes can degrade rendering performance if not marked as 'pure'."],
+                    use: "Formatting dates from DB into readable strings, displaying prices with local currency symbols.",
+                    code: `<span class="token-tag">&lt;p&gt;</span>Birthday: {{ birthday | date:'medium' }}<span class="token-tag">&lt;/p&gt;</span>\n<span class="token-tag">&lt;p&gt;</span>Cost: {{ 5000 | currency:'INR' }}<span class="token-tag">&lt;/p&gt;</span>`,
+                    runOutput: "<p>Birthday: Apr 9, 2026, 10:20:00 AM</p><p>Cost: ₹5,000.00</p>"
+                },
+                {
+                    id: "u2_2", title: "Service and Dependency Injection",
+                    def: "<b>Services:</b> Classes containing business logic or data fetching code.<br><b>Dependency Injection (DI):</b> A design pattern where Angular automatically provides (injects) the required service instances to a component's constructor.",
+                    adv: ["Code reusability across multiple components.", "Decouples data logic from UI logic.", "Makes unit testing components easier by mocking services."],
+                    dis: ["Overusing root-level injected services can increase memory footprint if not managed properly."],
+                    use: "Fetching API data via HTTP, sharing data between unrelated components.",
+                    code: `@Injectable({ providedIn: 'root' })\n<span class="token-keyword">export class</span> DataService { }\n\nconstructor(<span class="token-keyword">private</span> api: DataService) { }`,
+                    runOutput: "✅ DataService successfully injected into Component. API data ready to fetch."
+                },
+                {
+                    id: "u2_3", title: "Introduction to Single Page Application (SPA)",
+                    def: "A Single Page Application is a web app that interacts with the user by dynamically rewriting the current web page with new data from the web server, instead of the default method of loading entire new pages.",
+                    adv: ["Fast, fluid user experience (feels like a native app).", "Reduced server load (only JSON data is transmitted, not HTML)."],
+                    dis: ["Poor initial SEO (though fixable with SSR).", "Requires JavaScript to be enabled in browser.", "Heavy initial payload."],
+                    use: "SaaS Dashboards, Social Media feeds, Web Email clients.",
+                    code: `// SPA logic intercepts traditional &lt;a href&gt; clicks and uses JavaScript to load only the required component views.`,
+                    runOutput: "Navigated to /dashboard without page reload. Data fetched dynamically."
+                },
+                {
+                    id: "u2_4", title: "Angular Component Router",
+                    def: "The Angular Router enables navigation from one view to the next as users perform application tasks. It maps URL paths to Angular Components.",
+                    adv: ["Supports lazy loading (loading modules only when needed).", "Route guards protect unauthorized access.", "Maintains browser history (Back button works)."],
+                    dis: ["Configuration can get complex with nested child routes."],
+                    use: "Navigating between Home, About Us, and Dashboard components.",
+                    code: `<span class="token-keyword">const</span> routes: Routes = [\n  { path: 'login', component: LoginComponent }\n];\n<span class="token-tag">&lt;router-outlet&gt;&lt;/router-outlet&gt;</span>`,
+                    runOutput: "URL changed to '/login'. Rendering LoginComponent inside <router-outlet>."
+                },
+                {
+                    id: "u2_5", title: "Deploying an Angular App",
+                    def: "Deployment is the process of compiling the TypeScript and SCSS code into highly optimized vanilla HTML, CSS, and JS files, and hosting them on a web server.",
+                    adv: ["Code is minified and obfuscated.", "AOT (Ahead of Time) compilation makes the app incredibly fast in production."],
+                    dis: ["Build process can take time for very large applications.", "Requires a static hosting server configuration."],
+                    use: "Publishing the finished application to Firebase Hosting, AWS S3, or Azure App Service.",
+                    code: `<span class="token-keyword">ng build --configuration production</span>\n# Generates a /dist folder ready for deployment.`,
+                    runOutput: "Building... ✔ Compiled successfully. Output in /dist/my-app. Ready for hosting!"
+                }
+            ],
+            "3": [
+                {
+                    id: "u3_1", title: "AngularJS, Intro to MVC, What is AngularJS",
+                    def: "<b>AngularJS (1.x):</b> A legacy JavaScript framework by Google.<br><b>MVC (Model-View-Controller):</b> An architectural pattern. Model manages data, View displays UI, Controller connects them and handles logic.",
+                    adv: ["Revolutionized frontend dev with two-way binding.", "Easy to include via a simple `<script>` tag without build tools."],
+                    dis: ["Performance bottlenecks with large data sets (dirty checking).", "Obsolete; completely rewritten into modern 'Angular' (v2+)."],
+                    use: "Maintaining legacy enterprise applications built before 2016.",
+                    code: `var app = angular.module('myApp', []);\napp.controller('myCtrl', function($scope) {\n  $scope.msg = "Legacy MVC";\n});`,
+                    runOutput: "AngularJS initialized. Model updated View with message: Legacy MVC"
+                },
+                {
+                    id: "u3_2", title: "What is SPA (Recap)",
+                    def: "A Single Page Application (SPA) in the context of AngularJS utilizes `ngRoute` or `ui-router` to swap out HTML templates within an `ng-view` directive without full page reloads.",
+                    adv: ["Smooth transitions.", "Less bandwidth usage after initial load."],
+                    dis: ["Memory leaks can occur if controllers are not destroyed properly."],
+                    use: "Creating traditional AngularJS portals.",
+                    code: `<span class="token-tag">&lt;div</span> <span class="token-attr">ng-view</span><span class="token-tag">&gt;&lt;/div&gt;</span>\n// Injects templates here based on URL.`,
+                    runOutput: "Route changed. Loading template.html into ng-view."
+                },
+                {
+                    id: "u3_3", title: "Angular Directives, Expression, Controller",
+                    def: "<b>Directives:</b> Markers on a DOM element (e.g. `ng-app`, `ng-model`).<br><b>Expressions:</b> `{{ }}` used to bind application data to HTML.<br><b>Controller:</b> JS function containing business logic and setting up the `$scope`.",
+                    adv: ["Clear separation of logic (Controller) and UI (Directives).", "Expressions are evaluated securely against the scope."],
+                    dis: ["Too many watchers on expressions slow down the app.", "Controller 'scope soup' makes debugging hard in large apps."],
+                    use: "Controlling a specific section of the HTML page.",
+                    code: `<span class="token-tag">&lt;div</span> <span class="token-attr">ng-controller</span>=<span class="token-string">"MathCtrl"</span><span class="token-tag">&gt;</span>\n  Result: {{ 5 + 5 }}\n<span class="token-tag">&lt;/div&gt;</span>`,
+                    runOutput: "Result: 10 (Evaluated by AngularJS Expression)"
+                },
+                {
+                    id: "u3_4", title: "Angular Model, Services, Module",
+                    def: "<b>Module:</b> A container for the different parts of an app (controllers, services, filters). Defined by `angular.module()`.<br><b>Model:</b> The data, usually bound via `ng-model`.<br><b>Services:</b> Singleton objects used to organize and share code (e.g., `$http` for API calls).",
+                    adv: ["Modules keep global namespace clean.", "Built-in services like $http simplify AJAX calls.", "Models provide instant two-way binding."],
+                    dis: ["Syntax for defining components was messy before Component architecture was introduced later."],
+                    use: "Architecting a full AngularJS application structure.",
+                    code: `var app = angular.module("myApp", []);\napp.service("dataService", function() { \n  this.getData = function() { return "Data"; } \n});`,
+                    runOutput: "Module 'myApp' registered. 'dataService' injected and ready."
+                }
+            ],
+            "4": [
+                {
+                    id: "u4_1", title: "Angular Filter / Filters",
+                    def: "Note: In modern Angular, these are called 'Pipes', but in AngularJS they were 'Filters'. They are used to format data for display. E.g., `uppercase`, `currency`, `orderBy`, `filter` (for searching arrays).",
+                    adv: ["Extremely powerful for instantly searching/sorting lists in the UI.", "Does not alter the original array."],
+                    dis: ["Can cause massive performance hits if filtering large arrays directly in the template."],
+                    use: "Creating a search bar that instantly filters a list of employees.",
+                    code: `<span class="token-tag">&lt;li</span> <span class="token-attr">ng-repeat</span>=<span class="token-string">"user in users | filter:searchText"</span><span class="token-tag">&gt;</span>\n  {{ user.name | uppercase }}\n<span class="token-tag">&lt;/li&gt;</span>`,
+                    runOutput: "Applied Filter: Searching for 'Amit'. Result: AMIT KUMAR."
+                },
+                {
+                    id: "u4_2", title: "Angular Data Binding & DOM",
+                    def: "<b>Data Binding:</b> The automatic synchronization of data between the model and view components.<br><b>DOM:</b> Angular handles Document Object Model manipulation via Directives (like `ng-show`, `ng-hide`, `ng-class`) instead of manually finding elements with JS.",
+                    adv: ["Eliminates the need for jQuery.", "Keeps UI consistently synced with data state automatically."],
+                    dis: ["Direct DOM manipulation via JS is highly discouraged and can break the Angular ecosystem."],
+                    use: "Toggling visibility of elements, dynamically adding CSS classes based on variables.",
+                    code: `<span class="token-tag">&lt;button</span> <span class="token-attr">ng-click</span>=<span class="token-string">"showBox = !showBox"</span><span class="token-tag">&gt;</span>Toggle<span class="token-tag">&lt;/button&gt;</span>\n<span class="token-tag">&lt;div</span> <span class="token-attr">ng-show</span>=<span class="token-string">"showBox"</span><span class="token-tag">&gt;</span>DOM Element<span class="token-tag">&lt;/div&gt;</span>`,
+                    runOutput: "Button Clicked -> showBox is true -> Element rendered in DOM."
+                },
+                {
+                    id: "u4_3", title: "Angular Validations & Forms",
+                    def: "Angular provides client-side form validation using HTML5 attributes (required, minlength, pattern) and tracks the state of the form (e.g., `$valid`, `$invalid`, `$touched`, `$dirty`).",
+                    adv: ["Instant feedback to user without server requests.", "Built-in CSS classes (`ng-invalid`) applied automatically for easy styling."],
+                    dis: ["Client-side validation can be bypassed; server-side validation is still mandatory."],
+                    use: "Login forms, Contact forms, ensuring correct email formats.",
+                    code: `<span class="token-tag">&lt;form</span> <span class="token-attr">name</span>=<span class="token-string">"myForm"</span><span class="token-tag">&gt;</span>\n  <span class="token-tag">&lt;input</span> type="email" name="userEmail" ng-model="email" required<span class="token-tag">&gt;</span>\n  <span class="token-tag">&lt;span</span> ng-show="myForm.userEmail.$invalid"<span class="token-tag">&gt;</span>Error<span class="token-tag">&lt;/span&gt;</span>\n<span class="token-tag">&lt;/form&gt;</span>`,
+                    runOutput: "Validation Check: Email format incorrect. Error span is visible."
+                },
+                {
+                    id: "u4_4", title: "Dependencies Injection (Deep Dive)",
+                    def: "Dependency Injection (DI) is a core concept where objects are passed their dependencies rather than creating them. Angular has an Injector subsystem that creates components, resolves their dependencies, and provides them.",
+                    adv: ["Makes code highly modular.", "Allows for easy swapping of services (e.g., swapping a real API service with a Mock service for testing)."],
+                    dis: ["Circular dependencies can crash the application.", "Syntax complexity when providing specific tokens."],
+                    use: "Injecting logging services, HTTP services, or configuration environments into components.",
+                    code: `// Constructor Injection\nconstructor(<span class="token-keyword">private</span> http: HttpClient) { \n  this.http.get('api/data').subscribe(); \n}`,
+                    runOutput: "Injector provided HttpClient instance successfully."
+                }
+            ],
+            "5": [
+                {
+                    id: "u5_1", title: "Conclusion & Node.js Sites and Resources",
+                    def: "<b>Node.js:</b> An open-source, cross-platform JavaScript runtime environment that executes JS code outside a web browser (on the server).<br><b>Resources:</b> NPM (Node Package Manager) is the world's largest software registry containing libraries for Node.",
+                    adv: ["Non-blocking, event-driven architecture makes it extremely fast.", "Uses JavaScript for both frontend and backend (FullStack).", "Massive open-source ecosystem (NPM)."],
+                    dis: ["Not suitable for heavy CPU-intensive computing tasks.", "Callback hell (though mitigated by async/await)."],
+                    use: "Building scalable APIs, real-time chat applications, streaming servers.",
+                    code: `npm init -y\nnpm install express mongoose cors`,
+                    runOutput: "Packages installed successfully. Node.js environment ready."
+                },
+                {
+                    id: "u5_2", title: "Hosting Node Projects",
+                    def: "Deploying a Node.js backend requires a server environment that supports running long-lived Node processes. This typically involves using process managers like PM2, or deploying via containerization (Docker).",
+                    adv: ["Can run on virtually any OS (Linux, Windows, macOS).", "Cloud platforms offer 'Platform as a Service' (PaaS) specifically optimized for Node."],
+                    dis: ["Managing environment variables securely in production requires care.", "Node process crashing brings down the server without a manager like PM2."],
+                    use: "Hosting REST APIs on Heroku, Render, AWS EC2, or Azure App Service.",
+                    code: `// Basic Node.js HTTP Server\n<span class="token-keyword">const</span> http = require('http');\nhttp.createServer((req, res) => {\n  res.end('Node Server Running');\n}).listen(8080);`,
+                    runOutput: "Server started on http://localhost:8080"
+                },
+                {
+                    id: "u5_3", title: "Hosting MEAN-STACK Application",
+                    def: "<b>MEAN:</b> MongoDB (Database), Express.js (Backend Framework), Angular (Frontend UI), Node.js (Runtime).<br>Hosting involves deploying the MongoDB database (e.g., Atlas), the Node/Express backend API, and serving the static Angular build files.",
+                    adv: ["Single language (JS/TS) across the entire stack.", "JSON data flows seamlessly from Database to Frontend UI.", "Highly scalable architecture."],
+                    dis: ["Complex deployment pipeline (need to manage DB, Backend, and Frontend separately or compile Frontend into Backend static folder)."],
+                    use: "Full-scale enterprise web applications, e-commerce platforms.",
+                    code: `// Express serving Angular static build\nconst express = require('express');\nconst app = express();\napp.use(express.static('./dist/my-angular-app'));\napp.listen(process.env.PORT || 3000);`,
+                    runOutput: "🟢 MEAN Stack Hosted: MongoDB Connected | Express Server Running | Angular App Served."
+                }
+            ]
+        };
+
+        // DOM Elements
+        const topicList = document.getElementById('topicList');
+        const contentArea = document.getElementById('contentArea');
+        const sidebarTitle = document.getElementById('sidebarTitle');
+
+        // Logic to Load Unit Sidebar
+        function loadUnit(unitId) {
+            sidebarTitle.innerText = `Topics (Unit ${unitId})`;
+            topicList.innerHTML = '';
+            
+            const topics = syllabusData[unitId];
+            topics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerHTML = `<span style="color:var(--primary); font-weight:bold; margin-right:8px;">${index+1}.</span> ${topic.title}`;
+                btn.onclick = () => renderTopic(topic, btn);
+                topicList.appendChild(btn);
+            });
+
+            // Auto click first topic
+            if(topicList.firstChild) {
+                topicList.firstChild.click();
+            }
+        }
+
+        // Logic to Render Content Area
+        function renderTopic(data, activeBtn) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+            if(activeBtn) activeBtn.classList.add('active');
+
+            // Generate Content HTML
+            const html = `
+                <div class="fade-in">
+                    <div class="topic-header">
+                        <h1>${data.title}</h1>
+                    </div>
+                    
+                    <div class="card def-card full-width" style="margin-bottom: 20px;">
+                        <h3>📖 Definition & Theory</h3>
+                        <p>${data.def}</p>
+                    </div>
+
+                    <div class="grid-container">
+                        <div class="card adv-card">
+                            <h3>🟢 Advantages</h3>
+                            <ul class="feature-list adv">
+                                ${data.adv.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="card dis-card">
+                            <h3>🔴 Disadvantages</h3>
+                            <ul class="feature-list dis">
+                                ${data.dis.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card use-card full-width" style="margin-bottom: 20px;">
+                        <h3>💼 Industry Use Cases</h3>
+                        <p style="font-weight: 500; color: #4f46e5;">${data.use}</p>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>💻 Code Implementation</span>
+                            <button class="run-btn" onclick="runCode()">▶ Run Simulator</button>
+                        </div>
+                        <div class="code-block">${data.code}</div>
+                    </div>
+
+                    <div class="card output-card full-width" id="outputContainer" style="display:none; margin-bottom: 50px;">
+                        <h3>⚙️ Simulator Output</h3>
+                        <div class="sim-box" id="outputBox"></div>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.innerHTML = html;
+            contentArea.scrollTop = 0; // Scroll to top
+
+            // Store current output for simulator
+            window.currentOutput = data.runOutput;
+        }
+
+        // Simulator Runner
+        function runCode() {
+            const outContainer = document.getElementById('outputContainer');
+            const outBox = document.getElementById('outputBox');
+            
+            outContainer.style.display = 'block';
+            outBox.innerHTML = "<span style='color:#94a3b8;'>Running code...</span>";
+            
+            setTimeout(() => {
+                outBox.innerHTML = window.currentOutput;
+            }, 600);
+        }
+
+        // Initialize First Load
+        window.onload = () => {
+            loadUnit("1"); // Load Unit 1 by default
+        };
+    </script>
+</body>
+</html>
